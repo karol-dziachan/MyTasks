@@ -7,6 +7,17 @@ namespace MyTasks.Api.Controllers
     [ApiController]
     public class TasksController : BaseController
     {
-        
+        [HttpGet("/test")]
+        public async Task<ActionResult> Test()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Ok("Ok");
+            }
+            else
+            {
+                return BadRequest("user is not authenticated");
+            }
+        }
     }
 }
