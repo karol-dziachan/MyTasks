@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyTasks.Persistence.Context;
 
@@ -11,9 +12,10 @@ using MyTasks.Persistence.Context;
 namespace MyTasks.Api.Migrations
 {
     [DbContext(typeof(MyTasksDbContext))]
-    partial class MyTasksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230625112009_FirstEntities")]
+    partial class FirstEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

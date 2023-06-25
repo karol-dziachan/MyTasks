@@ -12,6 +12,7 @@ namespace MyTasks.Persistence.Context
 
         public DbSet<Domain.Entities.Task> Tasks { get; set; }
         public DbSet<Note> Notes { get; set; }
+        public DbSet<UsersTasks> UsersTasks { get; set; }
 
         public MyTasksDbContext(DbContextOptions<MyTasksDbContext> options, IDateTime dateTime) : base(options)
         {
