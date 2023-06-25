@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\MyTasks.Application\MyTasks.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\MyTasks.Infrastructure\MyTasks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyTasks.Persistence\MyTasks.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

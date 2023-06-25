@@ -2,7 +2,7 @@
 
 namespace MyTasks.Domain.Entities
 {
-    public class Task : AuditableEntity
+    public class Note : AuditableEntity
     {
         public string Title { get; set; }
         public string Content { get; set; }
@@ -10,5 +10,6 @@ namespace MyTasks.Domain.Entities
         public DateTime? EndDateTime { get; set; }
         public DateTime? Duration { get; set; }
         public string OwnerName { get; set; }
+        public bool VisibleOnlyForOwner { get; set; }
     }
 }
