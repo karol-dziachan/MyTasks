@@ -30,4 +30,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.2-mauipre.1.22102.15" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyTasks.Domain\MyTasks.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

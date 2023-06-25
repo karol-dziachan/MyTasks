@@ -2,7 +2,7 @@
 
 namespace MyTasks.Domain.Entities
 {
-    public class Task : AuditableEntity
+    public class Note : AuditableEntity
     {
     }
 }
