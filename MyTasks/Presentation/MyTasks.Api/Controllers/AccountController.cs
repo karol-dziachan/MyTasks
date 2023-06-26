@@ -4,6 +4,7 @@ using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using MyTasks.Application.Common.Interfaces;
 
 namespace MyTasks.Api.Controllers
 {
@@ -11,6 +12,13 @@ namespace MyTasks.Api.Controllers
     [ApiController]
     public class AccountController : Controller
     {
+        private readonly IAuthInformationsHolder _holder;
+
+        public AccountController(IAuthInformationsHolder holder)
+        {
+            _holder = holder;
+        }
+
         [Route("/account/signup")]
         [HttpGet]
         public async Task Signup(string returnUrl = "/")
@@ -25,13 +33,22 @@ namespace MyTasks.Api.Controllers
 
         [Route("/account/login")]
         [HttpGet]
-        public async Task Login(string returnUrl = "/swagger/index.html")
+        public IActionResult Login(string returnUrl = "/account/callback")
         {
-            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-                .WithRedirectUri(returnUrl)
-                .Build();
+            var state = Guid.NewGuid().ToString();
 
-            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+            var authenticationProperties = new AuthenticationProperties
+            {
+                RedirectUri = returnUrl,
+                Items =
+                        {
+                            { "AuthState", state }
+                        }
+            };
+
+            Response.Cookies.Append("AuthState", state);
+
+            return Challenge(authenticationProperties, Auth0Constants.AuthenticationScheme);
         }
 
         [Authorize]
@@ -53,15 +70,36 @@ namespace MyTasks.Api.Controllers
         public async Task Logout()
         {
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-                // Indicate here where Auth0 should redirect the user after a logout.
-                // Note that the resulting absolute Uri must be added to the
-                // **Allowed Logout URLs** settings for the app.
                 .WithRedirectUri(Url.Action("Index", "Home", null, "https"))
                 .Build();
 
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             Response.Cookies.Delete(".AspNetCore.Cookies");
+        }
+
+        [HttpGet]
+        [Route("/account/callback")]
+        public async Task<IActionResult> Callback()
+        {
+            var authState = Request.Cookies["AuthState"];
+
+            var authenticateResult = await HttpContext.AuthenticateAsync(Auth0Constants.AuthenticationScheme);
+            if (!authenticateResult.Succeeded)
+            {
+                return BadRequest("Błąd uwierzytelniania.");
+            }
+
+            if (!authenticateResult.Properties.Items.TryGetValue("AuthState", out var state) || state != authState)
+            {
+                return BadRequest("Błąd uwierzytelniania.");
+            }
+
+            var token = authenticateResult.Properties.Items[".Token.id_token"];
+
+            _holder.IdToken = token;
+
+            return Redirect("/swagger");
         }
     }
 }

@@ -10,6 +10,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Auth0.ManagementApi" Version="7.21.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +32,9 @@
     <ProjectReference Include="..\..\Core\MyTasks.Application\MyTasks.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\MyTasks.Infrastructure\MyTasks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Infrastructure\MyTasks.Persistence\MyTasks.Persistence.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

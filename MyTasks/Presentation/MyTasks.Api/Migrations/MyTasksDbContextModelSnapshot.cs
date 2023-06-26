@@ -112,7 +112,7 @@ namespace MyTasks.Api.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerName")
+                    b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDateTime")

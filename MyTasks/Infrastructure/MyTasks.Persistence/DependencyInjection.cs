@@ -10,7 +10,8 @@ namespace MyTasks.Persistence
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<MyTasksDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("MyTasksDb"), b => b.MigrationsAssembly("MyTasks.Api")));
+            services.AddDbContext<MyTasksDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("MyTasksDb"), b => b.MigrationsAssembly("MyTasks.Api")), 
+                ServiceLifetime.Scoped);
             services.AddScoped<IMyTasksDbContext, MyTasksDbContext>();
 
             return services;
