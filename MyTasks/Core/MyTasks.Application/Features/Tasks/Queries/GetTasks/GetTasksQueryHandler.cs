@@ -8,13 +8,10 @@ namespace MyTasks.Application.Features.Tasks.Queries.GetTasks
     public class GetTasksQueryHandler : BaseRequestHandler,  IRequestHandler<GetTasksQuery, GetTasksVm>
     {
         private readonly IAuthService _authService;
-        private readonly IAuthInformationsHolder _holder;
 
-        public GetTasksQueryHandler(IMyTasksDbContext context, IAuthService authService,
-          IAuthInformationsHolder holder) : base(context)
+        public GetTasksQueryHandler(IMyTasksDbContext context, IAuthService authService) : base(context)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
-            _holder = holder;
         }
 
         public Task<GetTasksVm> Handle(GetTasksQuery request, CancellationToken cancellationToken)

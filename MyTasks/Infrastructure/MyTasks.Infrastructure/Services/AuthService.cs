@@ -2,8 +2,6 @@
 using Auth0.AuthenticationApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
-using RestSharp;
-using IdentityModel.Client;
 using Auth0.ManagementApi.Models;
 using Newtonsoft.Json;
 
@@ -25,28 +23,25 @@ namespace MyTasks.Infrastructure.Services
             return userInfo;
         }
 
-       /* public async Task<List<UserInfo>> GetAllUsersAsync()
+        public async Task<List<UserInfo>> GetAllUsersAsync()
         {
+            var accessToken = await GetManagementApiTokenAsync();
             var domain = _configuration["Auth0:Domain"];
-            var clientId = _configuration["Auth0:ClientId"];
-            var clientSecret = _configuration["Auth0:ClientSecret"];
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var client = new RestClient($"https://{domain}/api/v2/");
-            var request = new RestRequest("users", Method.Get);
-            request.AddHeader("Authorization", $"Bearer {GetManagementApiToken(domain, clientId, clientSecret)}");
+            var response = await httpClient.GetAsync($"https://{domain}/api/v2/users");
 
-            var response = await client.ExecuteAsync<List<User>>(request);
-
-            if (response.IsSuccessful)
+            if (response.IsSuccessStatusCode)
             {
-                var users = response.Data;
-                var userInfos = users.Select(MapToUserInfo).ToList();
-                return userInfos;
+                var usersJson = await response.Content.ReadAsStringAsync();
+                var users = JsonConvert.DeserializeObject<List<User>>(usersJson);
+                var userDtos = users.Select(MapToUserInfo).ToList();
+                return userDtos;
             }
 
-           
             throw new Exception("Error fetching users from Auth0.");
-        }*/
+        }
 
         public async Task<UserInfo> GetUserByIdAsync(string userId)
         {

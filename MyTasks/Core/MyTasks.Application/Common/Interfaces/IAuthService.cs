@@ -5,7 +5,7 @@ namespace MyTasks.Application.Common.Interfaces
     public interface IAuthService
     {
         UserInfo GetUserInfo(string idToken);
-       // Task<List<UserInfo>> GetAllUsersAsync();
+        Task<List<UserInfo>> GetAllUsersAsync();
         Task<UserInfo> GetUserByIdAsync(string userId);
     }
 }

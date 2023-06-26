@@ -5,14 +5,14 @@ using MyTasks.Application.Common.Interfaces;
 using MyTasks.Common.Exceptions;
 using MyTasks.Infrastructure.Services;
 
-namespace MyTasks.Application.Features.Tasks.Commands.UpdateTask
+namespace MyTasks.Application.Features.Tasks.Commands.DeleteTask
 {
-    public class UpdateTaskCommandHandler : BaseRequestHandler, IRequestHandler<UpdateTaskCommand, UpdateTaskResult>
+    public class DeleteTaskCommandHandler : BaseRequestHandler, IRequestHandler<DeleteTaskCommand, int>
     {
         private readonly IAuthService _authService;
         private readonly IAuthInformationsHolder _holder;
 
-        public UpdateTaskCommandHandler(IMyTasksDbContext context, IAuthService authService,
+        public DeleteTaskCommandHandler(IMyTasksDbContext context, IAuthService authService,
           IAuthInformationsHolder holder
             ) : base(context)
         {
@@ -20,35 +20,27 @@ namespace MyTasks.Application.Features.Tasks.Commands.UpdateTask
             _holder = holder;
         }
 
-        public async Task<UpdateTaskResult> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
         {
             var task = await _context.Tasks
                 .Where(task => task.Id == request.Id && task.StatusId == Status.ActiveRecord)
                 .FirstOrDefaultAsync(cancellationToken);
-            
-            if(!_authService.GetUserInfo(_holder.IdToken).UserId.Contains(task.OwnerId))
+
+            if (!_authService.GetUserInfo(_holder.IdToken).UserId.Contains(task.OwnerId))
             {
                 throw new UserIsNotOwnerException();
             }
 
-            if(task is null)
+            if (task is null)
             {
                 throw new ItemNotFoundException(request.Id, nameof(Domain.Entities.Task));
             }
 
-            var userInfo = _authService.GetUserInfo(_holder.IdToken);
-
-            task.Title = request.Title;
-            task.Content = request.Content;
-            task.Duration = request.Duration;
-            task.StartDateTime = request.StartDateTime; 
-            task.EndDateTime = request.EndDateTime;
-
-            _context.Tasks.Update(task);
+            _context.Tasks.Remove(task);
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return new UpdateTaskResult() { Id = task.Id };
+            return task.Id;
         }
     }
 }
