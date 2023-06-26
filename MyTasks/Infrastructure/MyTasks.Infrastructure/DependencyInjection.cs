@@ -12,7 +12,7 @@ namespace MyTasks.Infrastructure
         {
             services.AddTransient<IDateTime, DateTimeService>();
 
-            var auth0Uri = configuration["Auth0:DomainWithPrefix"];
+            var auth0Uri = configuration["Auth0:Domain"];
             var clientId = configuration["Auth0:ClientId"];
             var clientSecret = configuration["Auth0:ClientSecret"];
 
@@ -22,7 +22,7 @@ namespace MyTasks.Infrastructure
             }
 
             services.AddSingleton<IAuthInformationsHolder, AuthInformationsHolder>();
-            services.AddScoped<IAuthService>(provider => new AuthService(configuration));
+            services.AddScoped<IAuthService>(provider => new AuthService(auth0Uri, clientId, clientSecret));
 
             return services;
         }
