@@ -5,6 +5,7 @@ using MyTasks.Application.Features.Tasks.Commands.CreateTask;
 using MyTasks.Application.Features.Tasks.Commands.DeleteTask;
 using MyTasks.Application.Features.Tasks.Commands.UpdateTask;
 using MyTasks.Application.Features.Tasks.Queries.GetTasks;
+using MyTasks.Application.Features.Tasks.Queries.GetTasksByLoggedUser;
 
 namespace MyTasks.Api.Controllers
 {
@@ -26,6 +27,22 @@ namespace MyTasks.Api.Controllers
         public async Task<ActionResult> GetAllTasks()
         {
            return !User.Identity.IsAuthenticated ? Forbid("User is not authenticated") : Ok(await Mediator.Send(new GetTasksQuery()));
+        }
+
+        /// <summary>
+        ///  Get all tasks for logged user
+        /// </summary>
+        /// <returns>Book</returns>
+        /// <response code="200">If everything is ok</response>
+        /// <response code="403">If the user is not authorization</response>
+        /// <response code="404">If the book not found</response>
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetTasks()
+        {
+            return !User.Identity.IsAuthenticated ? Forbid("User is not authenticated") : Ok(await Mediator.Send(new GetTasksByLoggedUserQuery()));
         }
 
         /// <summary>
