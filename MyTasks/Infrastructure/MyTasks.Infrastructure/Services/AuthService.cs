@@ -43,11 +43,8 @@ namespace MyTasks.Infrastructure.Services
                 return userInfos;
             }
 
-            // Obsłuż błąd odpowiedzi
-            // Możesz go rzucić dalej lub zwrócić wartość domyślną
-            // Przykładowa obsługa:
-            // throw new Exception("Błąd w pobieraniu użytkowników z Auth0.");
-            return null;
+           
+            throw new Exception("Error fetching users from Auth0.");
         }
 
         public async Task<UserInfo> GetUserById(string userId)
@@ -69,14 +66,11 @@ namespace MyTasks.Infrastructure.Services
                 return userInfo;
             }
 
-            // Obsłuż błąd odpowiedzi
-            // Możesz go rzucić dalej lub zwrócić wartość domyślną, jeśli użytkownik nie został znaleziony
-            // Przykładowa obsługa:
-            // throw new Exception("Błąd w pobieraniu użytkownika z Auth0.");
-            return null;
+
+            throw new Exception("Error fetching user from Auth0.");
         }
 
-        private string GetManagementApiToken(string domain, string clientId, string clientSecret)
+        private static string GetManagementApiToken(string domain, string clientId, string clientSecret)
         {
             var client = new RestClient($"https://{domain}/oauth/token");
             var request = new RestRequest();
@@ -94,27 +88,23 @@ namespace MyTasks.Infrastructure.Services
                 return tokenResponse.AccessToken;
             }
 
-            // Obsłuż błąd odpowiedzi
-            // Możesz go rzucić dalej lub zwrócić wartość domyślną
-            // Przykładowa obsługa:
-            // throw new Exception("Błąd w uzyskiwaniu tokenu z Auth0.");
-            return null;
+            throw new Exception("Error fetching token from Auth0.");
         }
 
-        private UserInfo MapToUserInfo(User user)
+        private static UserInfo MapToUserInfo(User user)
         {
             var userInfo = new UserInfo
             {
                 UserId = user.UserId,
                 NickName = user.NickName,
                 Email = user.Email,
-                // Dodaj inne informacje użytkownika
+                // Add next informations
             };
 
             return userInfo;
         }
 
-        private UserInfo DecodeUserInfo(string idToken)
+        private static UserInfo DecodeUserInfo(string idToken)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(idToken);
@@ -124,7 +114,7 @@ namespace MyTasks.Infrastructure.Services
                 UserId = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
                 NickName = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value,
                 Email = token.Claims.FirstOrDefault(c => c.Type == "email")?.Value,
-                // Dodaj inne informacje, które chcesz odczytać z tokena id_token
+                // Add next informations
             };
 
             return userInfo;
