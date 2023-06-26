@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyTasks.Common\MyTasks.Common.csproj" />
     <ProjectReference Include="..\MyTasks.Domain\MyTasks.Domain.csproj" />
   </ItemGroup>
 

@@ -1,20 +1,25 @@
 ﻿using MediatR;
 using MyTasks.Application.Abstraction;
 using MyTasks.Application.Common.Interfaces;
-
+using MyTasks.Infrastructure.Services;
 
 namespace MyTasks.Application.Features.Tasks.Queries.GetTasks
 {
     public class GetTasksQueryHandler : BaseRequestHandler,  IRequestHandler<GetTasksQuery, GetTasksVm>
     {
-        public GetTasksQueryHandler(IMyTasksDbContext context) : base(context)
-        {
+        private readonly IAuthService _authService;
+        private readonly IAuthInformationsHolder _holder;
 
+        public GetTasksQueryHandler(IMyTasksDbContext context, IAuthService authService,
+          IAuthInformationsHolder holder) : base(context)
+        {
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            _holder = holder;
         }
 
         public Task<GetTasksVm> Handle(GetTasksQuery request, CancellationToken cancellationToken)
         {
-            var tasks = _context.Tasks;
+            var tasks = _context.Tasks.Where(task => task.StatusId == Status.ActiveRecord);
 
             if (!tasks.Any()) return default;
 
@@ -30,7 +35,7 @@ namespace MyTasks.Application.Features.Tasks.Queries.GetTasks
                     StartDateTime = task.StartDateTime,
                     EndDateTime = task.EndDateTime,
                     Duration = task.Duration,
-                    OwnerName = task.OwnerName,
+                    OwnerName = _authService.GetUserByIdAsync(task.OwnerId).Result.Email,
                 };
                 tasksVm.TaskDtos.Add(adaptTask);
             });

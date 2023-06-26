@@ -1,4 +1,4 @@
-﻿namespace MyTasks.Application.Features.Tasks.Commands
+﻿namespace MyTasks.Application.Features.Tasks.Commands.CreateTask
 {
     public class CreateTaskResult
     {

@@ -4,7 +4,6 @@ using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using MyTasks.Infrastructure;
 using MyTasks.Application.Common.Interfaces;
 
 namespace MyTasks.Api.Controllers
@@ -98,7 +97,6 @@ namespace MyTasks.Api.Controllers
 
             var token = authenticateResult.Properties.Items[".Token.id_token"];
 
-            //var holder = HttpContext.RequestServices.GetService<IAuthInformationsHolder>();
             _holder.IdToken = token;
 
             return Redirect("/swagger");

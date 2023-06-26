@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using RestSharp;
 using IdentityModel.Client;
 using Auth0.ManagementApi.Models;
+using Newtonsoft.Json;
 
 namespace MyTasks.Infrastructure.Services
 {
@@ -24,7 +25,7 @@ namespace MyTasks.Infrastructure.Services
             return userInfo;
         }
 
-        public async Task<List<UserInfo>> GetAllUsers()
+       /* public async Task<List<UserInfo>> GetAllUsersAsync()
         {
             var domain = _configuration["Auth0:Domain"];
             var clientId = _configuration["Auth0:ClientId"];
@@ -45,47 +46,52 @@ namespace MyTasks.Infrastructure.Services
 
            
             throw new Exception("Error fetching users from Auth0.");
-        }
+        }*/
 
-        public async Task<UserInfo> GetUserById(string userId)
+        public async Task<UserInfo> GetUserByIdAsync(string userId)
         {
+            var accessToken = await GetManagementApiTokenAsync();
             var domain = _configuration["Auth0:Domain"];
-            var clientId = _configuration["Auth0:ClientId"];
-            var clientSecret = _configuration["Auth0:ClientSecret"];
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var client = new RestClient($"https://{domain}/api/v2/");
-            var request = new RestRequest($"users/{userId}", Method.Get);
-            request.AddHeader("Authorization", $"Bearer {GetManagementApiToken(domain, clientId, clientSecret)}");
+            var response = await httpClient.GetAsync($"https://{domain}/api/v2/users/{userId}");
 
-            var response = await client.ExecuteAsync<User>(request);
-
-            if (response.IsSuccessful)
+            if (response.IsSuccessStatusCode)
             {
-                var user = response.Data;
-                var userInfo = MapToUserInfo(user);
-                return userInfo;
+                var userJson = await response.Content.ReadAsStringAsync();
+                var user = JsonConvert.DeserializeObject<User>(userJson);
+                var userDto = MapToUserInfo(user);
+                return userDto;
             }
 
-
-            throw new Exception("Error fetching user from Auth0.");
+            throw new Exception("Error fetching user nick from Auth0.");
         }
 
-        private static string GetManagementApiToken(string domain, string clientId, string clientSecret)
+
+        public async Task<string> GetManagementApiTokenAsync()
         {
-            var client = new RestClient($"https://{domain}/oauth/token");
-            var request = new RestRequest();
-            request.Method = Method.Post;
-            request.AddParameter("grant_type", "client_credentials");
-            request.AddParameter("client_id", clientId);
-            request.AddParameter("client_secret", clientSecret);
-            request.AddParameter("audience", $"https://{domain}/api/v2/");
-
-            var response = client.Execute<TokenResponse>(request);
-
-            if (response.IsSuccessful)
+            var clientId = _configuration["Auth0:ClientId"];
+            var clientSecret = _configuration["Auth0:ClientSecret"];
+            var domain = _configuration["Auth0:Domain"];
+            
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://{domain}/oauth/token");
+            request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                var tokenResponse = response.Data;
-                return tokenResponse.AccessToken;
+                { "grant_type", "client_credentials" },
+                { "client_id", clientId },
+                { "client_secret", clientSecret },
+                { "audience", $"https://{domain}/api/v2/" }
+            });
+
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var tokenResponseJson = await response.Content.ReadAsStringAsync();
+                var tokenResponse = JsonConvert.DeserializeObject<dynamic>(tokenResponseJson);
+                return tokenResponse.access_token;
             }
 
             throw new Exception("Error fetching token from Auth0.");
