@@ -1,6 +1,5 @@
 ﻿using MediatR;
 
-
 namespace MyTasks.Application.Features.Tasks.Queries.GetTasksByLoggedUser
 {
     public class GetTasksByLoggedUserVm : IRequest<GetTaskDto>

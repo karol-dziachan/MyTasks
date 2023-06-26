@@ -1,7 +1,6 @@
 ﻿using MyTasks.Application.Common.Interfaces;
 using Auth0.AuthenticationApi.Models;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
 using Auth0.ManagementApi.Models;
 using Newtonsoft.Json;
 
@@ -9,11 +8,15 @@ namespace MyTasks.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IConfiguration _configuration;
+        private readonly string _domain;
+        private readonly string _clientId;
+        private readonly string _secretId;
 
-        public AuthService(IConfiguration configuration)
+        public AuthService(string domain, string clientId, string secretId)
         {
-            _configuration = configuration;
+            _domain = domain ?? throw new ArgumentNullException(nameof(domain));
+            _clientId = clientId ?? throw new ArgumentNullException(nameof(clientId));
+            _secretId = secretId ?? throw new ArgumentNullException(nameof(secretId));
         }
 
         public UserInfo GetUserInfo(string idToken)
@@ -26,11 +29,10 @@ namespace MyTasks.Infrastructure.Services
         public async Task<List<UserInfo>> GetAllUsersAsync()
         {
             var accessToken = await GetManagementApiTokenAsync();
-            var domain = _configuration["Auth0:Domain"];
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await httpClient.GetAsync($"https://{domain}/api/v2/users");
+            var response = await httpClient.GetAsync($"https://{_domain}/api/v2/users");
 
             if (response.IsSuccessStatusCode)
             {
@@ -46,11 +48,10 @@ namespace MyTasks.Infrastructure.Services
         public async Task<UserInfo> GetUserByIdAsync(string userId)
         {
             var accessToken = await GetManagementApiTokenAsync();
-            var domain = _configuration["Auth0:Domain"];
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await httpClient.GetAsync($"https://{domain}/api/v2/users/{userId}");
+            var response = await httpClient.GetAsync($"https://{_domain}/api/v2/users/{userId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -66,18 +67,14 @@ namespace MyTasks.Infrastructure.Services
 
         public async Task<string> GetManagementApiTokenAsync()
         {
-            var clientId = _configuration["Auth0:ClientId"];
-            var clientSecret = _configuration["Auth0:ClientSecret"];
-            var domain = _configuration["Auth0:Domain"];
-            
             var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, $"https://{domain}/oauth/token");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_domain}/oauth/token");
             request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 { "grant_type", "client_credentials" },
-                { "client_id", clientId },
-                { "client_secret", clientSecret },
-                { "audience", $"https://{domain}/api/v2/" }
+                { "client_id", _clientId },
+                { "client_secret", _secretId },
+                { "audience", $"https://{_domain}/api/v2/" }
             });
 
             var response = await client.SendAsync(request);
