@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyTasks.Api.Abstraction;
+using MyTasks.Application.Features.Tasks.Commands.AssignTask;
 using MyTasks.Application.Features.Tasks.Commands.CreateTask;
 using MyTasks.Application.Features.Tasks.Commands.DeleteTask;
 using MyTasks.Application.Features.Tasks.Commands.UpdateTask;
@@ -25,7 +26,17 @@ namespace MyTasks.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetAllTasks()
         {
-           return !User.Identity.IsAuthenticated ? Forbid("User is not authenticated") : Ok(await Mediator.Send(new GetTasksQuery()));
+            if(!User.Identity.IsAuthenticated) Forbid("User is not authenticated");
+
+            try
+            {
+                var tasks = await Mediator.Send(new GetTasksQuery());
+                
+                return Ok(tasks);
+            }catch(Exception ex)
+            {
+                return NotFound();
+            }
         }
 
         /// <summary>
@@ -109,6 +120,32 @@ namespace MyTasks.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> DeleteTask(DeleteTaskCommand taskCommand)
+        {
+            if (!User.Identity.IsAuthenticated) return Forbid("User is not authenticated");
+
+            var vm = await Mediator.Send(taskCommand);
+
+            if (vm == default)
+            {
+                return BadRequest(taskCommand);
+            }
+
+            return Ok(vm);
+        }
+
+        /// <summary>
+        ///  Assigned task
+        /// </summary>
+        /// <param name="taskCommand">Command for assigned task</param>
+        /// <returns>A succesfully assigned task id</returns>
+        /// <response code="200">If the task was assigned succesfully</response>
+        /// <response code="403">If the request is invalid</response>
+        /// <response code="403">If the user is not authorization</response>
+        [HttpPost("/assign-task")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> DeleteTask(AssignTaskCommand taskCommand)
         {
             if (!User.Identity.IsAuthenticated) return Forbid("User is not authenticated");
 

@@ -33,7 +33,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.DeleteTask
 
             if (task is null)
             {
-                throw new ItemNotFoundException(request.Id, nameof(Domain.Entities.Task));
+                throw new ItemNotFoundException(request.Id.ToString(), nameof(Domain.Entities.Task));
             }
 
             _context.Tasks.Remove(task);
