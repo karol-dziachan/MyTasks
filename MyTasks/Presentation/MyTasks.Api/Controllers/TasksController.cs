@@ -33,7 +33,7 @@ namespace MyTasks.Api.Controllers
                 var tasks = await Mediator.Send(new GetTasksQuery());
                 
                 return Ok(tasks);
-            }catch(Exception ex)
+            }catch(Exception)
             {
                 return NotFound();
             }
