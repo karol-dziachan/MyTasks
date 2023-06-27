@@ -118,5 +118,11 @@ namespace MyTasks.Infrastructure.Services
             return userInfo;
         }
 
+        public async Task<bool> CheckUserExistsAsync(string userId)
+        {
+            var user = await GetUserByIdAsync(userId);
+
+            return user != null;
+        }
     }
 }

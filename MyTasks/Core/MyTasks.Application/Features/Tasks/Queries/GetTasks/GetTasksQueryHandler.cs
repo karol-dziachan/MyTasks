@@ -18,7 +18,7 @@ namespace MyTasks.Application.Features.Tasks.Queries.GetTasks
         {
             var tasks = _context.Tasks.Where(task => task.StatusId == Status.ActiveRecord);
 
-            if (!tasks.Any()) return default;
+            if (!tasks.Any()) return null;
 
             var tasksVm = new GetTasksVm();
 

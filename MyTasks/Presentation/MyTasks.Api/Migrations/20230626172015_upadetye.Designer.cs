@@ -12,8 +12,8 @@ using MyTasks.Persistence.Context;
 namespace MyTasks.Api.Migrations
 {
     [DbContext(typeof(MyTasksDbContext))]
-    [Migration("20230626150601_initiaildb")]
-    partial class initiaildb
+    [Migration("20230626172015_upadetye")]
+    partial class upadetye
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -160,10 +160,10 @@ namespace MyTasks.Api.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TaskId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserName")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

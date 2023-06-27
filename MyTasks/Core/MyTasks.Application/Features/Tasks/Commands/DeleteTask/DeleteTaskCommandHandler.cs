@@ -25,6 +25,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.DeleteTask
             var task = await _context.Tasks
                 .Where(task => task.Id == request.Id && task.StatusId == Status.ActiveRecord)
                 .FirstOrDefaultAsync(cancellationToken);
+            var assigns = _context.UsersTasks.Where(record => record.TaskId == request.Id);
 
             if (!_authService.GetUserInfo(_holder.IdToken).UserId.Contains(task.OwnerId))
             {
@@ -33,10 +34,15 @@ namespace MyTasks.Application.Features.Tasks.Commands.DeleteTask
 
             if (task is null)
             {
-                throw new ItemNotFoundException(request.Id, nameof(Domain.Entities.Task));
+                throw new ItemNotFoundException(request.Id.ToString(), nameof(Domain.Entities.Task));
             }
 
             _context.Tasks.Remove(task);
+
+            assigns.ToList().ForEach(record =>
+            {
+                _context.UsersTasks.Remove(record);
+            });
 
             await _context.SaveChangesAsync(cancellationToken);
 

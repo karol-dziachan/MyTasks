@@ -19,7 +19,11 @@ namespace MyTasks.Application.Features.Tasks.Queries.GetTasksByLoggedUser
         public Task<GetTasksByLoggedUserVm> Handle(GetTasksByLoggedUserQuery request, CancellationToken cancellationToken)
         {
             var userInfo = _authService.GetUserInfo(_holder.IdToken);
-            var tasks = _context.Tasks.Where(task => task.StatusId == Status.ActiveRecord && task.OwnerId == userInfo.UserId);
+            var tasks = _context.Tasks.Where(task => task.OwnerId == userInfo.UserId);
+            var assignTasksIds = _context.UsersTasks.Where(record => record.UserId == userInfo.UserId).Select(record => record.TaskId).ToList();
+            var assignTasks = _context.Tasks.Where(task => assignTasksIds.Contains(task.Id) && task.OwnerId != userInfo.UserId);
+            tasks = tasks.Concat(assignTasks);
+            tasks = tasks.Where(task => task.StatusId == Status.ActiveRecord);
 
             if (!tasks.Any()) return default;
 
