@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MyTasks.Application.Abstraction;
 using MyTasks.Application.Common.Interfaces;
+using MyTasks.Domain.Entities;
 
 namespace MyTasks.Application.Features.Tasks.Commands.CreateTask
 {
@@ -33,7 +34,15 @@ namespace MyTasks.Application.Features.Tasks.Commands.CreateTask
             };
 
             _context.Tasks.Add(task);
+            await _context.SaveChangesAsync(cancellationToken);
 
+            var usersTakss = new UsersTasks()
+            {
+                UserId = userInfo.UserId,
+                TaskId = task.Id,
+            };
+
+            _context.UsersTasks.Add(usersTakss);
             await _context.SaveChangesAsync(cancellationToken);
 
             return new CreateTaskResult() { Id = task.Id };
