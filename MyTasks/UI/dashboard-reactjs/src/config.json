@@ -1,0 +1,12 @@
+{
+    "development": 
+    { 
+        "name": "app one", 
+         "api_basepath": "https://localhost:7106" 
+    },
+    "production": 
+    { 
+        "name": "app one",  
+        "api_basepath": "path/to/api" 
+    }
+}

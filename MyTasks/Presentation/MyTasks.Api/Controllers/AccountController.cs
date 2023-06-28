@@ -99,7 +99,7 @@ namespace MyTasks.Api.Controllers
 
             _holder.IdToken = token;
 
-            return Redirect("/swagger");
+            return Redirect("http://localhost:3000/");
         }
     }
 }

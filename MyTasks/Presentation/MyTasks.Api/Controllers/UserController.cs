@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyTasks.Api.Abstraction;
 using MyTasks.Application.Common.Interfaces;
+using MyTasks.Application.Features.Users.GetInformationsAboutLoggetUser;
 
 namespace MyTasks.Api.Controllers
 {
@@ -36,6 +37,20 @@ namespace MyTasks.Api.Controllers
             if (!users.Any()) return NotFound();
 
             return Ok(users);
+        }
+
+        /// <summary>
+        ///  Get information about user
+        /// </summary>
+        /// <returns>Bool</returns>
+        /// <response code="200">Always</response>
+        [HttpGet("/user-authenticated")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> IsUferAuthenticated( )
+        {
+            var vm = await Mediator.Send(new GetInformationsAboutLoggetUserCommand(){  });
+
+            return Ok(vm.IsAuthenticated);  
         }
     }
 }

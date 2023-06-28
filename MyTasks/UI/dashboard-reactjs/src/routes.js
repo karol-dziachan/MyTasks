@@ -44,6 +44,7 @@ export const items = [
       label: "Dane",
       Icon: SettingsIcon,
       items: [
+        false ? 
         {
             path: "/tasks",
             name: "tasks",
@@ -52,7 +53,7 @@ export const items = [
             component: Profile,
             layout: "/actions",
             onClick , 
-        },
+        } : {},
       ]
     },
 
