@@ -229,7 +229,7 @@ export default function List({ tasksProp }) {
 	const handleAddTask = async () => {
 		try {
 			const { response, loading } = await sendRequest(paths.addTask.path, paths.addTask.method, editedTask);
-
+            editedTask.id = response.id; 
 			setSnackbarOpen(true);
 
 			if (loading) {
