@@ -3,5 +3,6 @@
     public interface IAuthInformationsHolder
     {
         string IdToken { get; set; }
+        string GetToken();
     }
 }

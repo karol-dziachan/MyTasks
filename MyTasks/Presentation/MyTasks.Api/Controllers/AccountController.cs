@@ -13,10 +13,12 @@ namespace MyTasks.Api.Controllers
     public class AccountController : Controller
     {
         private readonly IAuthInformationsHolder _holder;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountController(IAuthInformationsHolder holder)
+        public AccountController(IAuthInformationsHolder holder, IHttpContextAccessor httpContextAccessor)
         {
             _holder = holder;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [Route("/account/signup")]
@@ -41,9 +43,9 @@ namespace MyTasks.Api.Controllers
             {
                 RedirectUri = returnUrl,
                 Items =
-                        {
-                            { "AuthState", state }
-                        }
+        {
+            { "AuthState", state }
+        }
             };
 
             Response.Cookies.Append("AuthState", state);
@@ -56,26 +58,49 @@ namespace MyTasks.Api.Controllers
         [Route("/account/profile")]
         public IActionResult Profile()
         {
+            var name = User.Identity.Name;
+            var emailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var profileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+
+            HttpContext.Session.SetString("UserName", name);
+            HttpContext.Session.SetString("UserEmailAddress", emailAddress);
+            HttpContext.Session.SetString("UserProfileImage", profileImage);
+
             return View(new
             {
-                Name = User.Identity.Name,
-                EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
+                Name = name,
+                EmailAddress = emailAddress,
+                ProfileImage = profileImage
             });
         }
 
         [Authorize]
         [HttpGet]
         [Route("/account/logout")]
-        public async Task Logout()
+        public async Task<IActionResult> Logout()
         {
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-                .WithRedirectUri(Url.Action("Index", "Home", null, "https"))
+                .WithRedirectUri("http://localhost:3000/")
                 .Build();
 
-            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            Response.Cookies.Delete(".AspNetCore.Cookies");
+            Response.Cookies.Delete("IdToken");
+
+            if (_httpContextAccessor.HttpContext.Request.Cookies.ContainsKey("IdToken"))
+            {
+                Response.Cookies.Append("IdToken", "", new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(-1),
+                    Path = "/",
+                    SameSite = SameSiteMode.None,
+                    Secure = true
+                });
+
+            }
+
+            await HttpContext.Session.LoadAsync();
+            HttpContext.Session.Clear();
+
+            return Challenge(authenticationProperties, Auth0Constants.AuthenticationScheme);
         }
 
         [HttpGet]
@@ -90,16 +115,19 @@ namespace MyTasks.Api.Controllers
                 return BadRequest("Błąd uwierzytelniania.");
             }
 
-            if (!authenticateResult.Properties.Items.TryGetValue("AuthState", out var state) || state != authState)
-            {
-                return BadRequest("Błąd uwierzytelniania.");
-            }
-
             var token = authenticateResult.Properties.Items[".Token.id_token"];
 
+            Response.Cookies.Append("IdToken", token, new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true 
+            });
+
+            await HttpContext.Session.LoadAsync();
             _holder.IdToken = token;
 
-            return Redirect("/swagger");
+            return Redirect("http://localhost:3000/");
+            //return Redirect("/swagger");
         }
     }
 }

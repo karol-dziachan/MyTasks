@@ -13,7 +13,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import Sidebar from "../../Views/SideBar/Sidebar";
-import { items } from '../../routes';
+import items from '../../routes';
 import Switches from '../../components/Switches/Switches';
 
 import Badge from '@material-ui/core/Badge';
@@ -228,12 +228,12 @@ export default function Admin() {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
+          className={clsx(classes.menuButton, open && classes.hide)}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h8" noWrap>
-            Ghost Coder RSA
+          <Typography variant="h6" noWrap>
+            My tasks
             </Typography>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -290,7 +290,7 @@ export default function Admin() {
           </IconButton>
         </div>
         <Divider />
-        <Sidebar items={items} /> 
+        <Sidebar items={items()} /> 
       </Drawer>
       <main
         className={clsx(classes.content, {

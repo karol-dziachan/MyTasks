@@ -26,7 +26,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.UpdateTask
                 .Where(task => task.Id == request.Id && task.StatusId == Status.ActiveRecord)
                 .FirstOrDefaultAsync(cancellationToken);
             
-            if(!_authService.GetUserInfo(_holder.IdToken).UserId.Contains(task.OwnerId))
+            if(!_authService.GetUserInfo(_holder.GetToken()).UserId.Contains(task.OwnerId))
             {
                 throw new UserIsNotOwnerException();
             }
@@ -36,7 +36,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.UpdateTask
                 throw new ItemNotFoundException(request.Id.ToString(), nameof(Domain.Entities.Task));
             }
 
-            var userInfo = _authService.GetUserInfo(_holder.IdToken);
+            var userInfo = _authService.GetUserInfo(_holder.GetToken());
 
             task.Title = request.Title;
             task.Content = request.Content;

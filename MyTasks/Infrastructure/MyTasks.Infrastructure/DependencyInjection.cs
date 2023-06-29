@@ -21,7 +21,7 @@ namespace MyTasks.Infrastructure
                 throw new ArgumentNullException(nameof(auth0Uri));
             }
 
-            services.AddSingleton<IAuthInformationsHolder, AuthInformationsHolder>();
+            services.AddTransient<IAuthInformationsHolder, AuthInformationsHolder>();
             services.AddScoped<IAuthService>(provider => new AuthService(auth0Uri, clientId, clientSecret));
 
             return services;
