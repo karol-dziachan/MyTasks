@@ -1,6 +1,7 @@
 # MyTasks (WebApi + Front Layer)
 
 ### Karol Dziachan 
+#### Still in progress...
 
 ## Assumptions
 
