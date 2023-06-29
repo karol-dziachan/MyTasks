@@ -110,9 +110,23 @@ namespace MyTasks.Infrastructure.Services
             var userInfo = new UserInfo
             {
                 UserId = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
-                NickName = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value,
+                FullName = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value,
+                FirstName = token.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value,
+                LastName = token.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value,
+                MiddleName = token.Claims.FirstOrDefault(c => c.Type == "middle_name")?.Value,
+                NickName = token.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value,
+                PreferredUsername = token.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value,
+                Profile = token.Claims.FirstOrDefault(c => c.Type == "profile")?.Value,
+                Picture = token.Claims.FirstOrDefault(c => c.Type == "picture")?.Value,
+                Website = token.Claims.FirstOrDefault(c => c.Type == "website")?.Value,
                 Email = token.Claims.FirstOrDefault(c => c.Type == "email")?.Value,
-                // Add next informations
+                EmailVerified = token.Claims.FirstOrDefault(c => c.Type == "email_verified")?.Value == "true",
+                Gender = token.Claims.FirstOrDefault(c => c.Type == "gender")?.Value,
+                Birthdate = token.Claims.FirstOrDefault(c => c.Type == "birthdate")?.Value,
+                ZoneInformation = token.Claims.FirstOrDefault(c => c.Type == "zoneinfo")?.Value,
+                Locale = token.Claims.FirstOrDefault(c => c.Type == "locale")?.Value,
+                PhoneNumber = token.Claims.FirstOrDefault(c => c.Type == "phone_number")?.Value,
+                PhoneNumberVerified = token.Claims.FirstOrDefault(c => c.Type == "phone_number_verified")?.Value == "true"
             };
 
             return userInfo;

@@ -27,7 +27,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.DeleteTask
                 .FirstOrDefaultAsync(cancellationToken);
             var assigns = _context.UsersTasks.Where(record => record.TaskId == request.Id);
 
-            if (!_authService.GetUserInfo(_holder.IdToken).UserId.Contains(task.OwnerId))
+            if (!_authService.GetUserInfo(_holder.GetToken()).UserId.Contains(task.OwnerId))
             {
                 throw new UserIsNotOwnerException();
             }

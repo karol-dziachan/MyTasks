@@ -21,7 +21,7 @@ namespace MyTasks.Application.Features.Tasks.Commands.CreateTask
 
         public async Task<CreateTaskResult> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
         {
-            var userInfo = _authService.GetUserInfo(_holder.IdToken);
+            var userInfo = _authService.GetUserInfo(_holder.GetToken());
 
             var task = new Domain.Entities.Task()
             {

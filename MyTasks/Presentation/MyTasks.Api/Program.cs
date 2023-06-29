@@ -7,7 +7,7 @@ using MyTasks.Persistence;
 using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var configuration = builder.Configuration;
 
 builder.Services.AddAuth0WebAppAuthentication(options =>
 {
@@ -21,6 +21,35 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    //options.Cookie.IsEssential = true;
+   // options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+});
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.CheckConsentNeeded = context => true;
+    //options.Secure = CookieSecurePolicy.Always; // Wymaga ustawienia zabezpieczonego po³¹czenia HTTPS
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin", builder =>
+    {
+        builder.WithOrigins(configuration["Origins:Dev"]) // Dodaj pochodzenie, z którego oczekujesz ¿¹dañ
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+    });
+});
+
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddPersistence(builder.Configuration);
@@ -55,7 +84,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors(
+    /*app.UseCors(
         options => options
         .WithOrigins(builder.Configuration["Origins:Dev"])
         .AllowAnyMethod()
@@ -63,18 +92,21 @@ if (app.Environment.IsDevelopment())
         .AllowAnyOrigin()
         .AllowAnyHeader()
         .SetIsOriginAllowed(origin => true)
-    ); 
+    ); */
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.None,
-    Secure = CookieSecurePolicy.Always
-});
-
+   // HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+    //Secure = CookieSecurePolicy.None
+})
+    ;
+app.UseCors("AuthenticatedPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,0 +1,12 @@
+.calendar{
+
+}
+
+.calendar__view{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 21px;
+    margin-bottom: 30px;
+}

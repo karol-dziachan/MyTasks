@@ -17,7 +17,8 @@ namespace MyTasks.Application.Features.Users.GetInformationsAboutLoggetUser
         }
         public Task<GetInformationsAboutLoggetUserResult> Handle(GetInformationsAboutLoggetUserCommand request, CancellationToken cancellationToken)
         {
-            var user = string.IsNullOrEmpty(_holder.IdToken) ? null :_authService.GetUserInfo(_holder.IdToken);
+            var token = _holder.GetToken();
+            var user = string.IsNullOrEmpty(token) ? null :_authService.GetUserInfo(token);
             var result = new GetInformationsAboutLoggetUserResult()
             {
                 User = user,

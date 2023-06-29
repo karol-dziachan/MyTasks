@@ -1,29 +1,37 @@
 /* eslint-disable */
 import {React, useEffect, useState} from "react";
 import ConfigProvider from "./ConfigProvider"
-import GetCookie from "./GetCookie";
-import Cookies from 'js-cookie'
+import axios from 'axios';
+import Cookie from 'js-cookie'
 
 const consumeIsUserAuthenticated = () => {
-    var path = ConfigProvider("api_basepath") + '/user-authenticated';
-    const [response, setResponse] = useState([]);
-    // const cookie = Cookies.get('AspNetCore.Cookies');
-    // console.log('cookie ',  cookie)
-   useEffect(() => {
-      fetch(path, {
-        method: "GET", 
-      })
-         .then((response) => response.json())
-         .then((data) => {
-           console.log(data);
-         //   setResponse(data);
-         })
-         .catch((err) => {
-            console.log(err.message);
-         });
-   }, []);
+  var path = ConfigProvider("api_basepath") + '/user-authenticated';
+  const [response, setResponse] = useState([]);
+  useEffect(() => {
+    const fetchAuthenticatedUser = async () => {
+      try {
 
-   return response;
+        const requestOptions = {
+          method: "GET",
+          withCredentials: true,
+           headers: {
+            'Content-Type': 'application/json',
+            'Cookie': Cookie.get('IdToken') 
+          },
+        };
+
+        const response = await axios.get(path, requestOptions);
+        const data = response.data;
+        console.log(data);
+         setResponse(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    fetchAuthenticatedUser();
+  }, []);
+
+  return response;
 }
-
 export default consumeIsUserAuthenticated;

@@ -1,14 +1,28 @@
-﻿using MyTasks.Application.Common.Interfaces;
+﻿using Microsoft.AspNetCore.Http;
+using MyTasks.Application.Common.Interfaces;
 
 namespace MyTasks.Infrastructure.Holders
 {
-    class AuthInformationsHolder : IAuthInformationsHolder
+    public class AuthInformationsHolder : IAuthInformationsHolder
     {
-        public string IdToken { get; set; }
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthInformationsHolder()
+        public AuthInformationsHolder(IHttpContextAccessor httpContextAccessor)
         {
-            IdToken = String.Empty;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public string IdToken
+        {
+            get => _httpContextAccessor.HttpContext.Session.GetString("IdToken") ?? string.Empty;
+            set => _httpContextAccessor.HttpContext.Session.SetString("IdToken", value);
+        }
+
+        public string GetToken()
+        {
+            string sessionCookie = _httpContextAccessor.HttpContext.Request.Cookies["IdToken"];
+
+            return sessionCookie;
         }
     }
 }

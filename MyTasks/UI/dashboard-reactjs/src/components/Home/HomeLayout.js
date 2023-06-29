@@ -107,8 +107,8 @@ export default function HomeLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Ghost Coder RSA
+          <Typography variant="h2" noWrap>
+            MyTasks
           </Typography>
         </Toolbar>
       </AppBar>
